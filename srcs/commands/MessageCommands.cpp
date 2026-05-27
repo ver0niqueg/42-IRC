@@ -1,5 +1,9 @@
 #include "CommandHandler.hpp"
+#include "Client.hpp"
+#include "Server.hpp"
+#include "Channel.hpp"
 
+// PRIVMSG: send a private message to a user or to all members of a channel
 void CommandHandler::cmdPrivmsg(Client* client, const std::vector<std::string> &params)
 {
     if (!client->isRegistered())
@@ -56,6 +60,7 @@ void CommandHandler::cmdPrivmsg(Client* client, const std::vector<std::string> &
     }
 }
 
+// NOTICE: send a notice to a user or a channel
 void CommandHandler::cmdNotice(Client* client, const std::vector<std::string> &params)
 {
     if (!client->isRegistered())

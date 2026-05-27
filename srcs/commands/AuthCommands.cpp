@@ -1,7 +1,13 @@
 #include "CommandHandler.hpp"
 #include "Colors.hpp"
+#include "Client.hpp"   
+#include "Server.hpp"   
+#include "Channel.hpp"  
+#include <iostream>     
+#include <set>          
+#include <string>       
 
-// validate the client's password
+// PASS: verify the provided password, mark it as given and complete registration if possible
 void CommandHandler::cmdPass(Client* client, const std::vector<std::string> &params)
 {
     if (client->isRegistered()) 
@@ -27,7 +33,6 @@ void CommandHandler::cmdPass(Client* client, const std::vector<std::string> &par
         }
         client->setPasswordGiven(true);
         std::cout << PASTEL_VIOLET << "[INFO] " << DEFAULT << "Client " << client->getClientFd() << " provided correct password" << std::endl;
-        // Nouvelle logique : enregistrer si nick et user sont déjà là
         if (!client->getNickname().empty() && !client->getUsername().empty() && !client->isRegistered()) {
             client->setRegistered(true);
             sendWelcomeMsg(client);
@@ -40,7 +45,7 @@ void CommandHandler::cmdPass(Client* client, const std::vector<std::string> &par
     }
 }
 
-// validate or update a client's nickname
+// NICK: validate or update a client's nickname
 void CommandHandler::cmdNick(Client* client, const std::vector<std::string> &params)
 {
     if (params.empty()) 
@@ -88,7 +93,7 @@ void CommandHandler::cmdNick(Client* client, const std::vector<std::string> &par
     }
 }
 
-// register a new client with username and realname
+// USER: register a new client with username and realname
 void CommandHandler::cmdUser(Client* client, const std::vector<std::string> &params)
 {
     if (client->isRegistered())
@@ -120,42 +125,4 @@ void CommandHandler::cmdUser(Client* client, const std::vector<std::string> &par
         client->setRegistered(true);
         sendWelcomeMsg(client);
     }
-}
-
-// handle client quit command
-void CommandHandler::cmdQuit(Client* client, const std::vector<std::string> &params)
-{
-    std::string reason = "Client quit";
-    if (!params.empty())
-        reason = params[0];
-    
-    std::cout << "   Client " << client->getNickname() << " quit: " << reason << PASTEL_GREEN << " ✓" << DEFAULT << std::endl;
-    
-    const std::set<std::string>& channels = client->getJoinedChannels();
-    for (std::set<std::string>::const_iterator it = channels.begin(); it != channels.end(); ++it)
-    {
-        Channel* channel = _server->getChannel(*it);
-        if (channel)
-        {
-            std::string quitMsg = client->getPrefix() + " QUIT :" + reason + "\r\n";
-            _server->broadcastToChannel(*it, quitMsg, client->getClientFd());
-            channel->removeUser(client);
-            channel->removeOperator(client);
-        }
-    }
-    // finally remove the client from the server (close socket, free resources)
-    _server->removeClient(client->getClientFd());
-}
-
-// respond to PING command from client
-void CommandHandler::cmdPing(Client* client, const std::vector<std::string> &params)
-{
-    if (params.empty())
-    {
-        sendNumericReply(client, ERR_NEEDMOREPARAMS, "PING :Not enough parameters");
-        return;
-    }
-    
-    std::string response = ":" + _server->getServerName() + " PONG " + _server->getServerName() + " :" + params[0] + "\r\n";
-    client->sendMessage(response);
 }
