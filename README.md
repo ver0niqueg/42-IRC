@@ -102,7 +102,7 @@ Connect with an IRC client:
 nc localhost 6667
 ```
 
-Or use a dedicated IRC client like `irssi` or `weechat`:
+Or use a dedicated IRC client like `irssi`:
 ```bash
 irssi -c localhost -p 6667
 ```
