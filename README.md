@@ -1,6 +1,6 @@
-# GITIRC 💬
+# IRC 💬
 
-GITIRC is an IRC (Internet Relay Chat) server implementation that demonstrates network programming concepts. It helps understand the following concepts: socket programming, client-server architecture, event handling, command processing, and multi-client connection management.
+IRC is an IRC (Internet Relay Chat) server implementation that demonstrates network programming concepts. It helps understand the following concepts: socket programming, client-server architecture, event handling, command processing, and multi-client connection management.
 
 ## Table of contents
 
